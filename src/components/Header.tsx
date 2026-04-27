@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { HamburgerIcon } from './icons';
 
 export default function Header() {
@@ -51,15 +52,15 @@ export default function Header() {
   return (
     <header className={`site-header${scrolled ? ' scrolled' : ''}`}>
       <nav className="nav" aria-label="Primary">
-        <a href="/" className="brand" aria-label="EmergencyFundGuides home">
+        <Link href="/" className="brand" aria-label="EmergencyFundGuides home">
           <span className="brand-mark" aria-hidden="true">e</span>
           <span className="brand-name">EmergencyFund<span className="amp">·</span>Guides</span>
-        </a>
+        </Link>
         <ul className="nav-links" role="list">
-          <li><a href="/#how-it-works">How it works</a></li>
-          <li><a href="/#resources">Guides</a></li>
-          <li><a href="/#calculator">Get help</a></li>
-          <li><a href="/#calculator" className="nav-cta">Start free analysis</a></li>
+          <li><Link href="/#how-it-works">How it works</Link></li>
+          <li><Link href="/#resources">Guides</Link></li>
+          <li><Link href="/#calculator">Get help</Link></li>
+          <li><Link href="/#calculator" className="nav-cta">Start free analysis</Link></li>
         </ul>
         <button
           className="hamburger"
@@ -72,10 +73,10 @@ export default function Header() {
         </button>
       </nav>
       <div className={`mobile-menu${menuOpen ? ' open' : ''}`} id="mobileMenu">
-        <a href="/#how-it-works" onClick={closeMenu}>How it works</a>
-        <a href="/#resources" onClick={closeMenu}>Guides</a>
-        <a href="/#calculator" onClick={closeMenu}>Get help</a>
-        <a href="/#calculator" onClick={closeMenu}>Start free analysis →</a>
+        <Link href="/#how-it-works" onClick={closeMenu}>How it works</Link>
+        <Link href="/#resources" onClick={closeMenu}>Guides</Link>
+        <Link href="/#calculator" onClick={closeMenu}>Get help</Link>
+        <Link href="/#calculator" onClick={closeMenu}>Start free analysis →</Link>
       </div>
     </header>
   );
