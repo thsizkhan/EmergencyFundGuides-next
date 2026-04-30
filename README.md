@@ -121,6 +121,23 @@ await fetch('/api/submit', {
 });
 ```
 
+The project now includes `src/app/api/submit/route.ts` for Vercel deployments.
+
+- It can store leads in **MongoDB** when `MONGODB_URI` is present.
+- It can send lead notifications via **Resend** when `RESEND_API_KEY` and `LEAD_NOTIFY_EMAIL` are present.
+
+Set these env vars in Vercel Project Settings:
+
+```bash
+RESEND_API_KEY=...
+LEAD_NOTIFY_EMAIL=you@example.com
+LEAD_FROM_EMAIL="EmergencyFundGuides <onboarding@resend.dev>"
+
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<db>?retryWrites=true&w=majority
+MONGODB_DB=emergencyfundguides
+MONGODB_COLLECTION=leads
+```
+
 ## Notes from the port
 
 - The original prototype was a single static HTML file; component boundaries here mirror its semantic sections.

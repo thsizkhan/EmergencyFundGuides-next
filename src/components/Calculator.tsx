@@ -37,6 +37,8 @@ export default function Calculator() {
   const [comment, setComment] = useState('');
   const [tcpa, setTcpa] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const successRef = useRef<HTMLDivElement | null>(null);
 
@@ -101,7 +103,7 @@ export default function Calculator() {
     }
   }
 
-  function submitLead() {
+  async function submitLead() {
     if (!email) {
       setEmailError(true);
       document.getElementById('emailInput')?.focus();
@@ -111,7 +113,30 @@ export default function Calculator() {
       alert('Please agree to the terms to receive your free plan.');
       return;
     }
-    // Production hook would POST { ...answers, firstName, email, phone, comment, score: scoreLeadTotal(answers) }
+    setEmailError(false);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    const payload = {
+      ...answers,
+      firstName,
+      email,
+      phone,
+      comment,
+      score: scoreLeadTotal(answers),
+    };
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Submit failed');
+    } catch {
+      setSubmitError('We could not submit right now. Please try again in a moment.');
+      setIsSubmitting(false);
+      return;
+    }
+    setIsSubmitting(false);
     setView('success');
     setTimeout(() => {
       const node = successRef.current;
@@ -294,6 +319,8 @@ export default function Calculator() {
               comment={comment} setComment={setComment}
               tcpa={tcpa} setTcpa={setTcpa}
               emailError={emailError}
+              submitError={submitError}
+              isSubmitting={isSubmitting}
               onSubmit={submitLead}
               showCallButton={showCallButton}
             />
@@ -391,7 +418,7 @@ function CalcNav({
 function ResultsPanel({
   answers, firstName, setFirstName, email, setEmail, phone, setPhone,
   comment, setComment,
-  tcpa, setTcpa, emailError, onSubmit, showCallButton,
+  tcpa, setTcpa, emailError, submitError, isSubmitting, onSubmit, showCallButton,
 }: {
   answers: Answers;
   firstName: string; setFirstName: (v: string) => void;
@@ -400,7 +427,9 @@ function ResultsPanel({
   comment: string; setComment: (v: string) => void;
   tcpa: boolean; setTcpa: (v: boolean) => void;
   emailError: boolean;
-  onSubmit: () => void;
+  submitError: string | null;
+  isSubmitting: boolean;
+  onSubmit: () => Promise<void>;
   showCallButton: boolean;
 }) {
   const opts: RankedOption[] = buildOptions(answers);
@@ -479,9 +508,10 @@ function ResultsPanel({
           </label>
         </div>
         <button className="btn-submit" onClick={onSubmit} type="button">
-          Send my free action plan
+          {isSubmitting ? 'Sending...' : 'Send my free action plan'}
           <ArrowRight />
         </button>
+        {submitError && <p style={{ marginTop: 10, color: '#f7c4b9', fontSize: 13 }}>{submitError}</p>}
 
         <div className={`call-wrap${showCallButton ? ' visible' : ''}`}>
           <a href="tel:+18005551234" className="btn-call">
